@@ -1,13 +1,10 @@
 # Imports
 # Standard
 import aux_functions
-import datetime
 import numpy as np
 import pandas as pd
-import os
 # Data viz
 import matplotlib.pyplot as plt
-import seaborn as sns
 # Finances
 from yahooquery import Ticker
 # Other
