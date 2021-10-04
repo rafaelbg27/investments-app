@@ -41,10 +41,10 @@ file = st.file_uploader(
 
 if file:
     df_raw = pd.read_csv(file, thousands='.', decimal=',',
-                         sep=None, engine='python')
-    st.dataframe(df_raw.head())
+                         sep=None, engine='python', encoding='utf-8-sig')
     df_portfolio = pd.read_csv('portfolio.csv').dropna()
     df_target = pd.read_csv('target_prices.csv').dropna()
+    file.close()
 
     st.markdown('***')
     st.markdown('**Features disponíveis:**')
