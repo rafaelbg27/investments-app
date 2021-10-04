@@ -42,8 +42,7 @@ file = st.file_uploader(
 if file:
     df_raw = pd.read_csv(file, thousands='.', decimal=',',
                          sep=None, engine='python')
-    file.close()
-
+    st.dataframe(df_raw.head())
     df_portfolio = pd.read_csv('portfolio.csv').dropna()
     df_target = pd.read_csv('target_prices.csv').dropna()
 
