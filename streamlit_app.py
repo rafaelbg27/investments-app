@@ -40,12 +40,11 @@ file = st.file_uploader(
     'Faça upload do arquivo gerado pelo Kinvo em formato CSV.', type=['csv'])
 
 if file:
-
+    aux = file
     df_raw = pd.read_csv(file, thousands='.', decimal=',', sep=';')
     st.dataframe(df_raw.head())
     if len(df_raw.columns) < 5:
-        df_raw = pd.DataFrame()
-        df_raw = pd.read_csv(file, thousands='.', decimal=',', sep=',')
+        df_raw = pd.read_csv(aux, thousands='.', decimal=',', sep=',')
         st.dataframe(df_raw.head())
     # st.dataframe(df_raw.head())
     file.close()
