@@ -40,14 +40,8 @@ file = st.file_uploader(
     'Faça upload do arquivo gerado pelo Kinvo em formato CSV.', type=['csv'])
 
 if file:
-    st.text(file.columns)
-    aux = file
-    df_raw = pd.read_csv(file, thousands='.', decimal=',', sep=';')
-    st.dataframe(df_raw.head())
-    if len(df_raw.columns) < 5:
-        df1 = pd.read_csv(file, thousands='.', decimal=',', sep=',')
-        st.dataframe(df1.head())
-    # st.dataframe(df_raw.head())
+    df_raw = pd.read_csv(file, thousands='.', decimal=',',
+                         sep=None, engine='python')
     file.close()
 
     df_portfolio = pd.read_csv('portfolio.csv').dropna()
