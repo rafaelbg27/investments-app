@@ -44,8 +44,8 @@ if file:
     df_raw = pd.read_csv(file, thousands='.', decimal=',', sep=';')
     st.dataframe(df_raw.head())
     if len(df_raw.columns) < 5:
-        df_raw = pd.read_csv(aux, thousands='.', decimal=',', sep=',')
-        st.dataframe(df_raw.head())
+        df1 = pd.read_csv(file, thousands='.', decimal=',', sep=',')
+        st.dataframe(df1.head())
     # st.dataframe(df_raw.head())
     file.close()
 
