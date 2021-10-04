@@ -41,7 +41,9 @@ file = st.file_uploader(
 
 if file:
 
-    df_raw = pd.read_csv(file, thousands='.', decimal=",")
+    df_raw = pd.read_csv(file, thousands='.', decimal=',', sep=',')
+    if len(df_raw.columns) < 5:
+        df_raw = pd.read_csv(file, thousands='.', decimal=',', sep=';')
     # st.dataframe(df_raw.head())
     file.close()
 
