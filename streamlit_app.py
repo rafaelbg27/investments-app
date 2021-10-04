@@ -38,7 +38,7 @@ st.markdown('***')
 # File upload
 file = st.file_uploader(
     'Faça upload do arquivo gerado pelo Kinvo em formato CSV.', type=['csv'])
-
+st.text(file.columns)
 if file:
     aux = file
     df_raw = pd.read_csv(file, thousands='.', decimal=',', sep=';')
