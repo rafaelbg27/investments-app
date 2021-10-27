@@ -1,33 +1,19 @@
 # Imports
 # Standard
-import aux_functions
 import numpy as np
 import pandas as pd
 # Data viz
-import matplotlib.pyplot as plt
-# Finances
-from yahooquery import Ticker
-# Other
+from IPython.display import clear_output
 import streamlit as st
+# Other
 import warnings
 from pandas.core.common import SettingWithCopyWarning
+import aux_functions
 
-
+# Config
 aux_functions.max_width()
+warnings.filterwarnings(action="ignore", category=RuntimeWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
-
-# Constants and definitions
-# dict_product_type = {
-#     'Ações internacionais': 'acoes_int',
-#     'Ações nacionais': 'acoes_nac',
-#     'Caixa': 'caixa',
-#     'Fundos Imobiliários': 'fii',
-#     'Renda fixa Pós-fixada': 'rf_pos',
-#     'Renda fixa Pré-fixada': 'rf_pre'
-# }
-
-# color_palette = ['#ffa600', '#ff7c43', '#f95d6a',
-#                  '#d45087', '#a05195', '#665191', '#2f4b7c', '#003f5c']
 
 # Main
 st.title('Oportunidades de investimento')
@@ -43,22 +29,37 @@ if file:
     df_raw = pd.read_csv(file, thousands='.', decimal=',',
                          sep=None, engine='python', encoding='utf-8-sig')
     df_portfolio = pd.read_csv('portfolio.csv').dropna()
-    df_target = pd.read_csv('target_prices.csv').dropna()
+    df_clean = aux_functions.invest_cleaning(df_raw)
     file.close()
 
     st.markdown('***')
     st.markdown('**Features disponíveis:**')
     best_option = st.checkbox('Melhores recomendações')
+    manual_option = st.checkbox('Seleção manual')
     st.markdown('***')
 
     if best_option:
-        st.text('Essa feature ainda está em desenvolvimento :(')
         portfolio_option = st.selectbox(
-            'Qual seu perfil de investidor?', df_portfolio['investor_type'].str.capitalize())
+            'Qual seu perfil de investidor?', ['-'] + (list(df_portfolio['investor_type'].str.capitalize())))
+        cash = st.number_input('Valor do aporte: R$')
 
-    else:
+        if cash and portfolio_option != '-':
+
+            st.markdown('***')
+            max_n_cats = int((df_portfolio[df_portfolio['investor_type'] == portfolio_option.lower()] != 0).sum(
+                axis=1).values[0] - 1)
+            n_commends = st.slider('Em quantas categorias de investimento você quer distribuir seu aporte?',
+                                   min_value=1, max_value=max_n_cats, value=2, step=1)
+            st.subheader('Distribuição recomendada do aporte')
+            df_commend = aux_functions.get_commend_values(
+                df_clean, df_portfolio, cash, portfolio_option.lower(), n_commends)
+
+            aux_functions.show_stock_commends(
+                df_clean, df_commend, portfolio_option.lower())
+
+    if manual_option:
         product_option = st.selectbox('Onde você quer investir?', [
                                       'Ações nacionais', 'Ações internacionais', 'Fundos Imobiliários'])
-        df_clean = aux_functions.invest_cleaning(df_raw)
+
         aux_functions.get_recomendations_from_type(
             df_clean, product_option)
