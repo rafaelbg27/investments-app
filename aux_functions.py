@@ -97,6 +97,8 @@ def get_type(row):
 
 
 def invest_cleaning(df_raw):
+    df_raw = df_raw.groupby(
+        by=['Produto', 'Classe do Ativo']).sum().reset_index()
     df_raw['type'] = df_raw['Classe do Ativo'].apply(get_type)
     df_raw['ticker'] = np.where(df_raw['type'].isin(
         ['int', 'nac', 'fii']), df_raw['Produto'].apply(get_ticker), None)
@@ -107,6 +109,7 @@ def invest_cleaning(df_raw):
 
     df = df_raw[['ticker', 'type', 'value_applied',
                  'gross_balance', 'profit', 'percentage']]
+    df['profit'] = 100 * (df['gross_balance'] / df['value_applied'] - 1)
     numeric = ['value_applied', 'gross_balance', 'profit', 'percentage']
     for column in numeric:
         df.loc[:, column] = pd.to_numeric(df[column])
@@ -316,7 +319,7 @@ def show_stock_commends(df_clean, df_commend, investor):
         commend_value = df_commend.loc[df_commend['type']
                                        == invest_type, 'commend_value'].values[0]
         max_n_stocks = int((df_target[(df_target[investor] == 1) & (
-            df_target['type'] == invest_type)] != 0).sum(axis=0).values[0] - 1)
+            df_target['type'] == invest_type)] != 0).sum(axis=0).values[0])
         n_stocks = st.slider('Deseja recomendação de quantos ativos?'.format(), min_value=1,
                              max_value=max_n_stocks, value=3, step=1)
         df_stocks = get_stocks_recommendation_from_type(
