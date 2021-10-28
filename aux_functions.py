@@ -47,7 +47,7 @@ df_target = pd.read_excel(r'target_prices.xlsx', header=1, usecols=['ticker',
                                                                     'type',
                                                                     'target_price',
                                                                     'currency',
-                                                                    'alexandre', 'rafael', 'giovana'])
+                                                                    'superman', 'batman', 'princesa'])
 
 # Functions
 
@@ -299,6 +299,8 @@ def show_stock_commends(df_clean, df_commend, investor):
         df_sell['gross_balance'] > 0), 'ticker'].values
     sell_values = df_sell.loc[(df_sell['in_portfolio'] == 0) & (
         df_sell['gross_balance'] > 0), 'gross_balance'].values
+    sell_profits = df_sell.loc[(df_sell['in_portfolio'] == 0) & (
+        df_sell['gross_balance'] > 0), 'profit'].values
 
     if len(sell_stocks) > 0:
         st.markdown('***')
@@ -307,7 +309,7 @@ def show_stock_commends(df_clean, df_commend, investor):
         for i, col in enumerate(cols):
             with col:
                 st.metric(sell_stocks[i], 'R${:,.0f}'.format(
-                    sell_values[i]))
+                    sell_values[i]), '{:.2f}%'.format(sell_profits[i]))
 
     types_to_commend = df_commend.loc[df_commend['type'].isin(
         stock_types), 'type'].values
