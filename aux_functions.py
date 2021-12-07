@@ -225,11 +225,23 @@ def calculate_mape(y_true, y_pred, x, n_commends):
 def get_commend_values(df_clean, df_portfolio, cash, investor, n_commends):
     df_aux = df_portfolio[df_portfolio['investor_type'] == investor].drop(
         columns=['investor_type'])
+    st.text("")
+    cats_to_remove = st.multiselect(
+        'Deseja retirar alguma categoria da recomendação?',
+        np.sort(
+            np.array([
+                list(dict_product_type.keys())[list(
+                    dict_product_type.values()).index(x)]
+                for x in list(df_aux.columns) if x is not 'investor_type'
+            ])))
+    cols_remove = [dict_product_type[x] for x in cats_to_remove]
+    df_aux = df_aux.drop(columns=cols_remove)
     df_inv = df_aux.T.reset_index().rename(
         columns={
             'index': 'type',
             df_aux.index.values[0]: 'ideal_percentage'
         })
+
     df_inv = df_inv[df_inv['ideal_percentage'] > 0].merge(
         df_clean.drop(columns=['profit']).groupby('type').sum().reset_index(),
         on='type',
@@ -276,15 +288,16 @@ def get_commend_values(df_clean, df_portfolio, cash, investor, n_commends):
 
 def get_stocks_recommendation_from_type(df_sell, investor, commend_value,
                                         invest_type, n_stocks):
-
     df = df_sell.loc[(df_sell['type'] == invest_type)
                      & (df_sell['in_portfolio'] == 1)]
+
     # df['ticker_int'] = df['ticker_int'].fillna('-')
     df['currency'] = df['currency'].fillna(method='pad')
     type_results = df.apply(get_score, axis=1, result_type='expand')
     df = df.assign(score=type_results[0],
                    margin=type_results[1],
                    var_1month=type_results[2])
+    df = df.fillna(0)
     df['percentage_scaled'] = np.where(
         df['in_portfolio'] == 1,
         minmax_scale(df['percentage'], feature_range=(0, 1)), None)
@@ -334,11 +347,11 @@ def get_stocks_recommendation_from_type(df_sell, investor, commend_value,
 
 def show_stock_commends(df_clean, df_commend, investor):
     df_target_clean = df_target[[
-        'ticker', 'ticker_int', 'target_price', 'currency', investor
+        'ticker', 'type', 'ticker_int', 'target_price', 'currency', investor
     ]].rename(columns={investor: 'in_portfolio'})
     df_sell = df_target_clean.merge(
         df_clean.loc[df_clean['type'].isin(stock_types)],
-        on=['ticker'],
+        on=['ticker', 'type'],
         how='outer')
     df_sell['in_portfolio'] = df_sell['in_portfolio'].fillna(0)
     sell_stocks = df_sell.loc[(df_sell['in_portfolio'] == 0) &
