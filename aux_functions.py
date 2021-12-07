@@ -17,6 +17,7 @@ import warnings
 from pandas.core.common import SettingWithCopyWarning
 
 warnings.filterwarnings(action="ignore", category=RuntimeWarning)
+warnings.filterwarnings(action="ignore", category=UserWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 
 # Constants and definitions
