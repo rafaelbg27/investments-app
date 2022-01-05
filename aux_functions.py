@@ -236,7 +236,7 @@ def get_commend_values(df_clean, df_portfolio, cash, investor, n_commends):
                 for x in list(df_aux.columns) if x is not 'investor_type'
             ])))
     cols_remove = [dict_product_type[x] for x in cats_to_remove]
-    df_aux = df_aux.drop(columns=cols_remove)
+    # df_aux = df_aux.drop(columns=cols_remove)
     df_inv = df_aux.T.reset_index().rename(
         columns={
             'index': 'type',
@@ -250,8 +250,9 @@ def get_commend_values(df_clean, df_portfolio, cash, investor, n_commends):
     df_inv['ideal_balance'] = df_inv['ideal_percentage'] / \
         100 * (df_inv['gross_balance'].sum() + cash)
     df_inv['difference'] = df_inv['ideal_balance'] - df_inv['gross_balance']
-    df_inv = df_inv.sort_values(by='difference',
-                                ascending=False).reset_index(drop=True)
+    df_inv = df_inv.sort_values(by='difference', ascending=False)
+    df_inv = df_inv[~df_inv['type'].isin(cols_remove)].reset_index(drop=True)
+    st.dataframe(df_inv)
 
     # Minimization
     def fun(x):
@@ -267,7 +268,6 @@ def get_commend_values(df_clean, df_portfolio, cash, investor, n_commends):
                    method='trust-constr',
                    bounds=bnds,
                    constraints=cons)
-
     df_inv.loc[0:n_commends - 1, 'commend_value'] = np.round(res.x)
     df_inv['variation_percentage'] = 100 * \
         np.round(df_inv['commend_value'] / df_inv['ideal_balance'].sum(), 3)
