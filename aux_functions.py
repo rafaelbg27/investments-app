@@ -252,7 +252,6 @@ def get_commend_values(df_clean, df_portfolio, cash, investor, n_commends):
     df_inv['difference'] = df_inv['ideal_balance'] - df_inv['gross_balance']
     df_inv = df_inv.sort_values(by='difference', ascending=False)
     df_inv = df_inv[~df_inv['type'].isin(cols_remove)].reset_index(drop=True)
-    st.dataframe(df_inv)
 
     # Minimization
     def fun(x):
